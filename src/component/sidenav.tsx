@@ -14,7 +14,7 @@ export async function SideNav() {
   const { userId }: { userId: string | null } = auth();
   let userServerInfo: UserServerInfo[] | null = [];
   try {
-    const response = await fetch(`http://localhost:8080/getServers/${userId}`, {
+    const response = await fetch(`http://localhost:8080/servers/${userId}`, {
       cache: "no-store",
     });
     if (!response.ok) {

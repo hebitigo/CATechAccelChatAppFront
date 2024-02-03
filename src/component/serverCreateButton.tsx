@@ -33,7 +33,7 @@ export default function ServerAddButton({ userId }: Props) {
   } = useForm<FormValues>();
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     console.log(data);
-    fetch("http://localhost:8080/registerServer", {
+    fetch("http://localhost:8080/server", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,20 +57,6 @@ export default function ServerAddButton({ userId }: Props) {
     onClose();
   };
 
-  const createServer = (onClose: () => void) => {
-    // console.log("create server");
-    // fetch("http://localhost:8080/registerServer", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     user_id: userId,
-    //     name:
-    //   }),
-    // });
-    onClose();
-  };
   return (
     <>
       <button onClick={onOpen}>
