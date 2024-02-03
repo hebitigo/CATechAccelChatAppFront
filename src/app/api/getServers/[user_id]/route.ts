@@ -7,7 +7,24 @@ type MockUserServerData = {
   }[];
 };
 
+const clerkUserId = process.env.SAMPLE_CLERK_USER_ID;
+
+if (clerkUserId === undefined) {
+  throw new Error("process.env.SAMPLE_CLERK_USER_ID is not defined");
+}
+
 const mockUserServerData: MockUserServerData = {
+  // envのClerkのユーザーIDに対応するサーバー情報を返す
+  [clerkUserId]: [
+    {
+      id: "server_2bgXJjH89drnXFXMq5oPogGAGBC",
+      name: "server_2bgXJjH89drnXFXMq5oPogGAGBC",
+    },
+    {
+      id: "serverfapniofha",
+      name: "serverfapniofha",
+    },
+  ],
   userId1: [
     {
       id: "serverId1",

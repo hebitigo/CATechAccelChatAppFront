@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-screen">
+    <div className="flex   h-screen bg-slate-800">
       <SideNav />
       {children}
     </div>
