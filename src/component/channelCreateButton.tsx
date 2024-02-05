@@ -1,4 +1,3 @@
-"use client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -15,13 +14,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import { ChannelInfo } from "@/app/(authenticated)/chat/[server_id]/[channel_id]/page";
+
+type Props = {
+  serverId: string;
+  setChannelInfo: Dispatch<SetStateAction<ChannelInfo[] | null>>;
+};
 
 type FormValues = {
   channelName: string;
 };
 
-export default function ChannelCreateButton() {
+export default function ChannelCreateButton({
+  serverId,
+  setChannelInfo,
+}: Props) {
   const {
     register,
     handleSubmit,
@@ -29,6 +37,31 @@ export default function ChannelCreateButton() {
   } = useForm<FormValues>();
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     console.log(data);
+    fetch("http://localhost:8080/channel", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        server_id: serverId,
+        name: data.channelName,
+      }),
+    })
+      .then(async (response) => {
+        if (response.ok) {
+          console.log("channel registered successfully");
+          const channelInfo: ChannelInfo = await response.json();
+          setChannelInfo((prev) =>
+            prev ? [...prev, channelInfo] : [channelInfo]
+          );
+        } else {
+          const message = await response.text();
+          throw new Error(message);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to register channel", error);
+      });
     setOpen(false);
   };
   //https://github.com/shadcn-ui/ui/issues/88#issuecomment-1577482090
@@ -69,7 +102,7 @@ export default function ChannelCreateButton() {
 
           <DialogFooter>
             <Button type="submit" className="text-slate-300 border">
-              Save changes
+              作成
             </Button>
           </DialogFooter>
         </form>

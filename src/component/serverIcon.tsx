@@ -1,24 +1,22 @@
-"use client";
-
-import { Avatar } from "@nextui-org/react";
+import Link from "next/link";
 
 type Props = {
-  serverId: string;
   serverName: string;
+  serverId: string;
+  src: string;
 };
 
-export default function ServerIcon({ serverId, serverName }: Props) {
+export default function ServerIcon({ serverName, src, serverId }: Props) {
   return (
-    <Avatar
-      color="secondary"
-      size="lg"
-      radius="md"
-      showFallback
-      fallback={<p className="font-bold">{serverName}</p>}
-      as="button"
-      onClick={() => {
-        console.error(`${serverId}`);
-      }}
-    />
+    <Link
+      href={`/chat/${serverId}/init`}
+      className="overflow-hidden h-[55px] w-[55px] bg-slate-800  rounded-lg"
+    >
+      {src ? (
+        <img src={src} className="object-cover w-full h-full" />
+      ) : (
+        <span className="overflow-hidden    text-slate-200 ">{serverName}</span>
+      )}
+    </Link>
   );
 }

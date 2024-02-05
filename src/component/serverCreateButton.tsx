@@ -12,19 +12,22 @@ import {
   Checkbox,
   Input,
   Link,
+  user,
 } from "@nextui-org/react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { errorToJSON } from "next/dist/server/render";
+import { UserServerInfo } from "./sidenav";
+import { Dispatch, SetStateAction } from "react";
 
 type Props = {
   userId: string;
+  setUserServerInfo: Dispatch<SetStateAction<UserServerInfo[] | null>>;
 };
 
 type FormValues = {
   serverName: string;
 };
 
-export default function ServerAddButton({ userId }: Props) {
+export default function ServerAddButton({ userId, setUserServerInfo }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     register,
@@ -43,12 +46,18 @@ export default function ServerAddButton({ userId }: Props) {
         name: data.serverName,
       }),
     })
-      .then(async (response) => {
+      .then((response) => {
         if (response.ok) {
-          console.log("Server registered successfully");
+          console.log("Server registered successfully:");
+          response.json().then((userServerInfo: UserServerInfo) => {
+            setUserServerInfo((prev) =>
+              prev ? [...prev, userServerInfo] : [userServerInfo]
+            );
+          });
         } else {
-          const message = await response.json();
-          throw new Error(message);
+          response.json().then((message) => {
+            throw new Error(message);
+          });
         }
       })
       .catch((error) => {

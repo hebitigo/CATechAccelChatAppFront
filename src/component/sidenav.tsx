@@ -1,33 +1,47 @@
-import { Avatar, Button } from "@nextui-org/react";
-import { log } from "console";
-import { ReactElement } from "react";
-import { UserButton, auth } from "@clerk/nextjs";
+"use client";
+import { useEffect, useState } from "react";
+import { UserButton, useAuth } from "@clerk/nextjs";
 import ServerIcon from "@/component/serverIcon";
 import ServerCreateButton from "@/component/serverCreateButton";
 
-type UserServerInfo = {
-  id: string;
+export type UserServerInfo = {
+  server_id: string;
   name: string;
 };
 
-export async function SideNav() {
-  const { userId }: { userId: string | null } = auth();
-  let userServerInfo: UserServerInfo[] | null = [];
-  try {
-    const response = await fetch(`http://localhost:8080/servers/${userId}`, {
-      cache: "no-store",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to fetch user server info");
-    }
-    console.log("fetch server list is success!");
-    userServerInfo = await response.json();
-    console.log("userServerInfo:", userServerInfo);
-  } catch (error) {
-    // console.logは使えないので別の手段を使う
-    console.error(error);
-  }
-
+export function SideNav() {
+  const { userId } = useAuth();
+  const [userServerInfo, setUserServerInfo] = useState<UserServerInfo[] | null>(
+    null
+  );
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchServers = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/servers/${userId}`,
+          {
+            cache: "no-store",
+            signal: controller.signal,
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch user server info");
+        }
+        console.log("fetch server list is success!");
+        const initialServerInfo: UserServerInfo[] = await response.json();
+        setUserServerInfo(initialServerInfo);
+        console.log("userServerInfo:", userServerInfo);
+      } catch (error) {
+        // console.logは使えないので別の手段を使う
+        console.error(error);
+      }
+    };
+    fetchServers();
+    return () => {
+      controller.abort();
+    };
+  }, []);
   return (
     <div className="pr-1.5">
       <div className="h-full flex items-center flex-col p-4  min-w-16 place-content-between bg-zinc-900 rounded-md ">
@@ -35,13 +49,19 @@ export async function SideNav() {
           {userServerInfo?.map((serverInfo) => {
             return (
               <ServerIcon
-                key={serverInfo.id}
-                serverId={serverInfo.id}
+                key={serverInfo.server_id}
+                serverId={serverInfo.server_id}
                 serverName={serverInfo.name}
+                src={""}
               />
             );
           })}
-          {userId && <ServerCreateButton userId={userId} />}
+          {userId && (
+            <ServerCreateButton
+              userId={userId}
+              setUserServerInfo={setUserServerInfo}
+            />
+          )}
         </div>
         <UserButton afterSignOutUrl="/sign-in" />
       </div>

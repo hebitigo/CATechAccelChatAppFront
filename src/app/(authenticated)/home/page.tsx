@@ -11,7 +11,7 @@ export default async function Home({
   // console.log("user: ", user);
   const { from } = searchParams;
   console.log("from: ", from);
-  if (user && from === "sign-up") {
+  if (user) {
     const { id, username, imageUrl } = user;
     fetch("http://localhost:8080/user/upsert", {
       method: "POST",
