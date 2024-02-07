@@ -18,10 +18,13 @@ export function SideNav() {
     const controller = new AbortController();
     const fetchServers = async () => {
       try {
-        const response = await fetch(`http://localhost:/servers/${userId}`, {
-          cache: "no-store",
-          signal: controller.signal,
-        });
+        const response = await fetch(
+          `http://localhost:8080/servers/${userId}`,
+          {
+            cache: "no-store",
+            signal: controller.signal,
+          }
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch user server info");
         }
