@@ -1,10 +1,10 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 // import { Link } from "@nextui-org/react";
 import Link from "next/link";
-import ChannelButton from "@/component/channelButton";
+import ChannelButton from "@/components/ChannelButton";
 
-import ChannelCreateButton from "@/component/channelCreateButton";
+import ChannelCreateButton from "@/components/ChannelCreateButton";
 import { redirect, useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -20,11 +20,15 @@ export type ChannelInfo = {
 
 const ChannelName = ["General", "Random", "Music", "Gaming", "Anime", "Manga"];
 export default function Page() {
+  //dynamic paramが変わっても再レンダリングされない
   const router = useRouter();
   const { server_id, channel_id } = useParams<Params>();
   // let channelInfo: ChannelInfo[] | null = [];
   const [channelInfo, setChannelInfo] = useState<ChannelInfo[] | null>(null);
-
+  //websocketで情報を受け取ってstateの配列に追加
+  //channel_idなどをuseEffectの第二引数に渡してdynamic paramが変更されてチャンネル
+  //が切り替わったときにcontextに保持している配列を初期化するような
+  //hooksを実行させる
   useEffect(() => {
     const controller = new AbortController();
     const fetchChannelInfo = async () => {

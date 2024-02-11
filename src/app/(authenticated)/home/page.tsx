@@ -1,5 +1,5 @@
 import { Button, Badge, Avatar } from "@nextui-org/react";
-import { SignOutButton } from "@/component/signOutButton";
+import { SignOutButton } from "@/components/SignOutButton";
 import { auth, currentUser } from "@clerk/nextjs";
 
 export default async function Home({

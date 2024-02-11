@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { UserButton, useAuth } from "@clerk/nextjs";
-import ServerIcon from "@/component/serverIcon";
-import ServerCreateButton from "@/component/serverCreateButton";
+import ServerIcon from "@/components/ServerIcon";
+import ServerCreateButton from "@/components/ServerCreateButton";
 
 export type UserServerInfo = {
   server_id: string;
@@ -17,6 +17,7 @@ export function SideNav() {
   useEffect(() => {
     const controller = new AbortController();
     const fetchServers = async () => {
+      if (!userId) return;
       try {
         const response = await fetch(
           `http://localhost:8080/servers/${userId}`,
@@ -41,7 +42,7 @@ export function SideNav() {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [userId]);
   return (
     <div className="pr-1.5">
       <div className="h-full flex items-center flex-col p-4  min-w-16 place-content-between bg-zinc-900 rounded-md ">

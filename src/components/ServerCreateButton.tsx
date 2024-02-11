@@ -15,7 +15,7 @@ import {
   user,
 } from "@nextui-org/react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { UserServerInfo } from "./sidenav";
+import { UserServerInfo } from "./Sidenav";
 import { Dispatch, SetStateAction } from "react";
 
 type Props = {
