@@ -9,7 +9,7 @@ type Props = {
 export default function ServerIcon({ serverName, src, serverId }: Props) {
   return (
     <Link
-      href={`/chat/${serverId}/init`}
+      href={`/chat/${serverName}/${serverId}/init`}
       className="overflow-hidden h-[55px] w-[55px] bg-slate-800  rounded-lg"
     >
       {src ? (

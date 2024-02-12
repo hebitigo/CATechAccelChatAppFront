@@ -2,9 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -15,7 +13,7 @@ import { Label } from "@/components/ui/Label";
 import { Button } from "@/components/ui/Button";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Dispatch, SetStateAction, useState } from "react";
-import { ChannelInfo } from "@/app/(authenticated)/chat/[server_id]/[channel_id]/page";
+import { ChannelInfo } from "@/app/(authenticated)/chat/[server_name]/[server_id]/[channel_id]/page";
 
 type Props = {
   serverId: string;

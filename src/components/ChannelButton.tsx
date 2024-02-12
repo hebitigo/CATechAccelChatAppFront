@@ -11,6 +11,8 @@ type Props = {
 
 export default function ChannelButton({ channelName, href }: Props) {
   const pathname = usePathname();
+  console.log("pathname is ", pathname);
+  console.log("href is ", href);
   return (
     <Button
       asChild
