@@ -75,12 +75,14 @@ export default function ServerAddButton({ userId, setUserServerInfo }: Props) {
           const message = await response.text();
           throw new Error(message);
         }
+        setIsCreateServerOpen(false);
+        setIsDropdownOpen(false);
       })
       .catch((error) => {
+        setIsCreateServerOpen(false);
+        setIsDropdownOpen(false);
         console.error("Failed to register server", error);
       });
-    setIsCreateServerOpen(false);
-    setIsDropdownOpen(false);
   };
   const joinServerViaInvitationHandle: SubmitHandler<
     InvitedServerFormValues
@@ -110,7 +112,7 @@ export default function ServerAddButton({ userId, setUserServerInfo }: Props) {
       .catch((error) => {
         console.error("Failed to join server", error);
       });
-    setIsCreateServerOpen(false);
+    setIsJoinServerOpen(false);
     setIsDropdownOpen(false);
   };
 
