@@ -1,13 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/Button";
 import ChannelButton from "@/components/ChannelButton";
-
+import ChatScreen from "@/components/ChatScreen";
 import ChannelCreateButton from "@/components/ChannelCreateButton";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/use-toast";
+import { WebSocketContext } from "@/app/WebSocketProvider";
 
 type Params = {
   server_id: string;
@@ -22,14 +23,22 @@ export type ChannelInfo = {
 
 const ChannelName = ["General", "Random", "Music", "Gaming", "Anime", "Manga"];
 export default function Page() {
+  const { setChannelId, setServerId } = useContext(WebSocketContext);
+  //contextから引っ張ってきて更新みたいにする
+  //{setchannelId} = context
+  //setchannelId
   //dynamic paramが変わっても再レンダリングされない
   const { user } = useUser();
 
   const router = useRouter();
   const { server_id, server_name, channel_id } = useParams<Params>();
+  useEffect(() => {
+    console.log("server_id", server_id);
+    console.log("channel_id", channel_id);
+    setChannelId(channel_id);
+    setServerId(server_id);
+  }, [channel_id, server_id]);
   const [channelInfo, setChannelInfo] = useState<ChannelInfo[] | null>(null);
-
-  const [isCopied, setIsCopied] = useState(false);
 
   const decodedServerName = decodeURIComponent(server_name);
 
@@ -37,22 +46,24 @@ export default function Page() {
     token: string;
   };
   const generateInviteTokenAndCopyToClipboard = () => {
-    fetch("http://localhost:8080/server/create/invitation", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_id: user?.id,
-        server_id: server_id,
-      }),
-    })
+    fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/server/create/invitation`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: user?.id,
+          server_id: server_id,
+        }),
+      }
+    )
       .then(async (response) => {
         if (response.ok) {
           console.log("token generate success!");
           const inviteToken: InviteToken = await response.json();
           await navigator.clipboard.writeText(inviteToken.token);
-          setIsCopied(true);
           toast({
             title: "Invite token copyed!",
           });
@@ -79,7 +90,7 @@ export default function Page() {
     const fetchChannelInfo = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8080/channels/${server_id}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/channels/${server_id}`,
           {
             cache: "no-store",
             signal: controller.signal,
@@ -113,42 +124,45 @@ export default function Page() {
     };
   }, []);
   return (
-    <div className="w-64 bg-gray-800 border-r border-gray-700">
-      <div className="flex border-b border-gray-700 flex-col p-4 gap-4">
-        <div className="  flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-white">
-            {decodedServerName}
-          </h2>
-          <div>
-            {user && (
-              <Button
-                className="text-white border-white bg-black"
-                size="sm"
-                variant="outline"
-                onClick={generateInviteTokenAndCopyToClipboard}
-              >
-                Invite
-              </Button>
-            )}
-            <Toaster />
+    <>
+      <div className="w-64 bg-gray-800 border-r border-gray-700">
+        <div className="flex border-b border-gray-700 flex-col p-4 gap-4">
+          <div className="  flex justify-between items-center">
+            <h2 className="text-lg font-semibold text-white">
+              {decodedServerName}
+            </h2>
+            <div>
+              {user && (
+                <Button
+                  className="text-white border-white bg-black"
+                  size="sm"
+                  variant="outline"
+                  onClick={generateInviteTokenAndCopyToClipboard}
+                >
+                  Invite
+                </Button>
+              )}
+              <Toaster />
+            </div>
           </div>
+          <ChannelCreateButton
+            serverId={server_id}
+            setChannelInfo={setChannelInfo}
+          />
         </div>
-        <ChannelCreateButton
-          serverId={server_id}
-          setChannelInfo={setChannelInfo}
-        />
+        <nav className="flex flex-col gap-2 py-4 px-2">
+          {channelInfo?.map((channel) => {
+            return (
+              <ChannelButton
+                key={channel.channel_id}
+                channelName={channel.name}
+                href={`/chat/${server_name}/${server_id}/${channel.channel_id}`}
+              />
+            );
+          })}
+        </nav>
       </div>
-      <nav className="flex flex-col gap-2 py-4 px-2">
-        {channelInfo?.map((channel) => {
-          return (
-            <ChannelButton
-              key={channel.channel_id}
-              channelName={channel.name}
-              href={`/chat/${server_name}/${server_id}/${channel.channel_id}`}
-            />
-          );
-        })}
-      </nav>
-    </div>
+      <ChatScreen server_id={server_id} channel_id={channel_id} />
+    </>
   );
 }

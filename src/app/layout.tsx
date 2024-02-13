@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 import { Providers } from "@/app/providers";
+import { WebsocketProvider } from "./WebSocketProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,9 +21,11 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>
+        <body className={`${inter.className} max-w-[100vw]`}>
           <ThemeProvider defaultTheme="dark">
-            <Providers>{children}</Providers>
+            <Providers>
+              <WebsocketProvider>{children}</WebsocketProvider>
+            </Providers>
           </ThemeProvider>
         </body>
       </html>

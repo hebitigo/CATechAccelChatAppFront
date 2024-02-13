@@ -20,7 +20,7 @@ export function SideNav() {
       if (!userId) return;
       try {
         const response = await fetch(
-          `http://localhost:8080/servers/${userId}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/servers/${userId}`,
           {
             cache: "no-store",
             signal: controller.signal,

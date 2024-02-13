@@ -35,7 +35,7 @@ export default function ChannelCreateButton({
   } = useForm<FormValues>();
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     console.log(data);
-    fetch("http://localhost:8080/channel", {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/channel`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

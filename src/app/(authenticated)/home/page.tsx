@@ -13,7 +13,7 @@ export default async function Home({
   console.log("from: ", from);
   if (user) {
     const { id, username, imageUrl } = user;
-    fetch("http://localhost:8080/user/upsert", {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}:8080/user/upsert`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

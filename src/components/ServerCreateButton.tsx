@@ -54,7 +54,7 @@ export default function ServerAddButton({ userId, setUserServerInfo }: Props) {
 
   const createServerHandle: SubmitHandler<CreateServerFormValues> = (data) => {
     console.log(data);
-    fetch("http://localhost:8080/server", {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/server`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export default function ServerAddButton({ userId, setUserServerInfo }: Props) {
   const joinServerViaInvitationHandle: SubmitHandler<
     InvitedServerFormValues
   > = (data) => {
-    fetch("http://localhost:8080/server/join", {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/server/join`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
