@@ -9,7 +9,6 @@ import { useUser } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/use-toast";
 import { WebSocketContext } from "@/app/WebSocketProvider";
-import isEqual from "lodash/isEqual";
 
 type Params = {
   server_id: string;
