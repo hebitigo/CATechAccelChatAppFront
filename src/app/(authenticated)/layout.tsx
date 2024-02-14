@@ -1,4 +1,4 @@
-import { SideNav } from "@/component/sidenav";
+import { SideNav } from "@/components/Sidenav";
 
 export default function AuthLayout({
   children,
