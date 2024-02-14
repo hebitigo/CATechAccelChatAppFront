@@ -52,66 +52,63 @@ export default function ServerAddButton({ userId, setUserServerInfo }: Props) {
     formState: { errors: errorsInvitedServer },
   } = useForm<InvitedServerFormValues>();
 
-  const createServerHandle: SubmitHandler<CreateServerFormValues> = (data) => {
-    console.log(data);
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/server`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_id: userId,
-        name: data.serverName,
-      }),
-    })
-      .then(async (response) => {
-        if (response.ok) {
-          console.log("Server registered successfully:");
-          const userServerInfo: UserServerInfo = await response.json();
-          setUserServerInfo((prev) =>
-            prev ? [...prev, userServerInfo] : [userServerInfo]
-          );
-        } else {
-          const message = await response.text();
-          throw new Error(message);
+  const createServerHandle: SubmitHandler<CreateServerFormValues> = async (
+    data
+  ) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/server`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            name: data.serverName,
+          }),
         }
-        setIsCreateServerOpen(false);
-        setIsDropdownOpen(false);
-      })
-      .catch((error) => {
-        setIsCreateServerOpen(false);
-        setIsDropdownOpen(false);
-        console.error("Failed to register server", error);
-      });
+      );
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      const userServerInfo: UserServerInfo = await response.json();
+      setUserServerInfo((prev) =>
+        prev ? [...prev, userServerInfo] : [userServerInfo]
+      );
+    } catch (error) {
+      console.error("Failed to register server", error);
+    }
+    setIsCreateServerOpen(false);
+    setIsDropdownOpen(false);
   };
   const joinServerViaInvitationHandle: SubmitHandler<
     InvitedServerFormValues
-  > = (data) => {
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/server/join`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        user_id: userId,
-        token: data.token,
-      }),
-    })
-      .then(async (response) => {
-        if (response.ok) {
-          console.log("join server successfully");
-          const userServerInfo: UserServerInfo = await response.json();
-          setUserServerInfo((prev) =>
-            prev ? [...prev, userServerInfo] : [userServerInfo]
-          );
-        } else {
-          const message = await response.text();
-          throw new Error(message);
+  > = async (data) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/server/join`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            token: data.token,
+          }),
         }
-      })
-      .catch((error) => {
-        console.error("Failed to join server", error);
-      });
+      );
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      const userServerInfo: UserServerInfo = await response.json();
+      setUserServerInfo((prev) =>
+        prev ? [...prev, userServerInfo] : [userServerInfo]
+      );
+    } catch (error) {
+      console.error("Failed to join server", error);
+    }
     setIsJoinServerOpen(false);
     setIsDropdownOpen(false);
   };

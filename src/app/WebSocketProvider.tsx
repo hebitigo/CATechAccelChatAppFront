@@ -60,21 +60,8 @@ export function WebsocketProvider({ children }: { children: React.ReactNode }) {
 
   const handlePayload = useCallback(
     (payload: BroadCastedPayload) => {
-      console.log("data type:", payload.action_type);
       if (payload.action_type === "chat_message") {
         const message: ChatMessage = payload.payload;
-        console.log(
-          "message.server_id is ",
-          message.server_id,
-          "serverId is ",
-          serverId
-        );
-        console.log(
-          "message.channel_id is ",
-          message.channel_id,
-          "channelId is ",
-          channelId
-        );
         if (
           message.server_id === serverId &&
           message.channel_id === channelId
@@ -99,7 +86,6 @@ export function WebsocketProvider({ children }: { children: React.ReactNode }) {
       setWs(null);
     };
   }, [user]);
-  console.log("Channel Messages:", boradCastedChannelChatMessage);
 
   //wsのイベントリスナーの設定
   useEffect(() => {
@@ -144,34 +130,6 @@ export function WebsocketProvider({ children }: { children: React.ReactNode }) {
       console.log("message received!:", data);
       handlePayload(data);
     };
-    // if (ws !== null) {
-    //   ws.onmessage = (event) => {
-    //     const data: BroadCastedPayload = JSON.parse(event.data);
-    //     console.log("message received!:", data);
-    //     console.log("data type:", data.action_type);
-    //     if (data.action_type === "chat_message") {
-    //       const message: ChatMessage = data.payload;
-    //       console.log(
-    //         "message.server_id is ",
-    //         message.server_id,
-    //         "serverId is ",
-    //         serverId
-    //       );
-    //       console.log(
-    //         "message.channel_id is ",
-    //         message.channel_id,
-    //         "channelId is ",
-    //         channelId
-    //       );
-    //       if (
-    //         message.server_id === serverId &&
-    //         message.channel_id === channelId
-    //       ) {
-    //         setBroradCastedChannelChatMessage((prev) => [...prev, message]);
-    //       }
-    //     }
-    //   };
-    // }
   }, [channelId]);
 
   return (

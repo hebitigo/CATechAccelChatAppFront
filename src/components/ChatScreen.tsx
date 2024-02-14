@@ -18,8 +18,6 @@ export default function ChatScreen({
   const messageEndRef = useRef<HTMLDivElement>(null);
   const handleMessage = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(inputRef.current?.value);
-    console.log("ws:", ws);
     ws?.send(
       JSON.stringify({
         action_type: "chat_message",
@@ -53,7 +51,6 @@ export default function ChatScreen({
       }
       try {
         if (response.ok) {
-          //   console.log("fetch Messages response:", await response.json());
           const messages: ChatMessage[] = await response.json();
 
           messages.sort((a, b) => {

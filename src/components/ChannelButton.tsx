@@ -12,17 +12,13 @@ type Props = {
 export default function ChannelButton({ channelName, href }: Props) {
   const pathname = usePathname();
   return (
-    <Button
-      asChild
-      className={clsx("justify-start gap-2  bg-black text-white", {
+    <Link
+      className={clsx("bg-black  truncate text-white w-full p-3 rounded-lg ", {
         "bg-slate-500": pathname === href,
       })}
-      size="lg"
-      variant="ghost"
+      href={href}
     >
-      <Link className="gap-2 truncate text-white w-full" href={href}>
-        {channelName}
-      </Link>
-    </Button>
+      {channelName}
+    </Link>
   );
 }

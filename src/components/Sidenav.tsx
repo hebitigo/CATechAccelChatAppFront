@@ -29,12 +29,9 @@ export function SideNav() {
         if (!response.ok) {
           throw new Error("Failed to fetch user server info");
         }
-        console.log("fetch server list is success!");
         const initialServerInfo: UserServerInfo[] = await response.json();
         setUserServerInfo(initialServerInfo);
-        console.log("userServerInfo:", userServerInfo);
       } catch (error) {
-        // console.logは使えないので別の手段を使う
         console.error(error);
       }
     };

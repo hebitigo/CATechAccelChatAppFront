@@ -9,6 +9,7 @@ import { useUser } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/use-toast";
 import { WebSocketContext } from "@/app/WebSocketProvider";
+import isEqual from "lodash/isEqual";
 
 type Params = {
   server_id: string;
@@ -24,17 +25,11 @@ export type ChannelInfo = {
 const ChannelName = ["General", "Random", "Music", "Gaming", "Anime", "Manga"];
 export default function Page() {
   const { setChannelId, setServerId } = useContext(WebSocketContext);
-  //contextから引っ張ってきて更新みたいにする
-  //{setchannelId} = context
-  //setchannelId
-  //dynamic paramが変わっても再レンダリングされない
   const { user } = useUser();
 
   const router = useRouter();
   const { server_id, server_name, channel_id } = useParams<Params>();
   useEffect(() => {
-    console.log("server_id", server_id);
-    console.log("channel_id", channel_id);
     setChannelId(channel_id);
     setServerId(server_id);
   }, [channel_id, server_id]);
@@ -45,47 +40,35 @@ export default function Page() {
   type InviteToken = {
     token: string;
   };
-  const generateInviteTokenAndCopyToClipboard = () => {
-    fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/server/create/invitation`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          user_id: user?.id,
-          server_id: server_id,
-        }),
-      }
-    )
-      .then(async (response) => {
-        if (response.ok) {
-          console.log("token generate success!");
-          const inviteToken: InviteToken = await response.json();
-          await navigator.clipboard.writeText(inviteToken.token);
-          toast({
-            title: "Invite token copyed!",
-          });
-        } else {
-          const message = await response.text();
-          throw Error(message);
+  const generateInviteTokenAndCopyToClipboard = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/server/create/invitation`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: user?.id,
+            server_id: server_id,
+          }),
         }
-      })
-      .catch((error) => {
-        console.error(
-          "error occured while generate invite server tokne:",
-          error
-        );
+      );
+      if (!response.ok) {
+        throw new Error("Failed to generate invite token");
+      }
+      const data: InviteToken = await response.json();
+      await navigator.clipboard.writeText(data.token);
+      toast({
+        title: "Invite token copyed!",
       });
+    } catch (error) {
+      console.error("error occured while generate invite server tokne:", error);
+    }
   };
 
-  //websocketで情報を受け取ってstateの配列に追加
-  //channel_idなどをuseEffectの第二引数に渡してdynamic paramが変更されてチャンネル
-  //が切り替わったときにcontextに保持している配列を初期化するような
-  //hooksを実行させる
   useEffect(() => {
-    console.log("server name is ", server_name);
     const controller = new AbortController();
     const fetchChannelInfo = async () => {
       try {
@@ -99,22 +82,22 @@ export default function Page() {
         if (!response.ok) {
           throw new Error("Failed to fetch channel info");
         }
-        console.log("fetch channel list is success!");
         const initChannelInfo: ChannelInfo[] = await response.json();
+
+        if (controller.signal.aborted) return;
         setChannelInfo(initChannelInfo);
 
-        console.log("channelInfo:", channelInfo);
         if (
-          !initChannelInfo?.some((channel) => channel.channel_id === channel_id)
+          initChannelInfo?.some((channel) => channel.channel_id === channel_id)
         ) {
-          if (initChannelInfo?.[0]) {
-            router.push(
-              `/chat/${server_name}/${server_id}/${initChannelInfo[0].channel_id}`
-            );
-          }
+          return;
         }
+        //initChannelInfoにfetchされた結果として[]が入った場合/chat/${server_name}/${server_id}/にrouter.pushが行われることになるので、
+        //チャンネル情報自体が配列に入っているかを確認するためにif文を書いています
+        router.push(
+          `/chat/${server_name}/${server_id}/${initChannelInfo[0].channel_id}`
+        );
       } catch (error) {
-        // console.logは使えないので別の手段を使う
         console.error(error);
       }
     };

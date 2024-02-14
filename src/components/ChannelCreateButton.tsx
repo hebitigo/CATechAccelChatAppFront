@@ -33,33 +33,29 @@ export default function ChannelCreateButton({
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>();
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    console.log(data);
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/channel`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        server_id: serverId,
-        name: data.channelName,
-      }),
-    })
-      .then(async (response) => {
-        if (response.ok) {
-          console.log("channel registered successfully");
-          const channelInfo: ChannelInfo = await response.json();
-          setChannelInfo((prev) =>
-            prev ? [...prev, channelInfo] : [channelInfo]
-          );
-        } else {
-          const message = await response.text();
-          throw new Error(message);
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/channel`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            server_id: serverId,
+            name: data.channelName,
+          }),
         }
-      })
-      .catch((error) => {
-        console.error("Failed to register channel", error);
-      });
+      );
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      const channelInfo: ChannelInfo = await response.json();
+      setChannelInfo((prev) => (prev ? [...prev, channelInfo] : [channelInfo]));
+    } catch (error) {
+      console.error("Failed to register channel", error);
+    }
     setOpen(false);
   };
   //https://github.com/shadcn-ui/ui/issues/88#issuecomment-1577482090
